@@ -9,21 +9,6 @@ import Inscri from './Pages/admin/Inscri';
 import Membros from './Pages/admin/Membros';
 import Consultas from './Pages/admin/Consultas';
 
-//firebas config
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { collection, query, where, getDocs } from 'firebase/firestore';
-
-const firebaseConfig = initializeApp ({
-  apiKey: "AIzaSyDAY377R-jjCUnmLLJJWqQg2AifRbtGAWM",
-  authDomain: "acma-2025.firebaseapp.com",
-  projectId: "acma-2025",
-  storageBucket: "acma-2025.firebasestorage.app",
-  messagingSenderId: "783282870292",
-  appId: "1:783282870292:web:0e959eed0ae585ec8eef01",
-  measurementId: "G-Y8WRBDVLHH"
-});
-
 
 const { Header, Content, Footer } = Layout;
 
@@ -85,7 +70,7 @@ const App = () => {
             Inscrições
           </Menu.Item>
           <Menu.Item key="pedidos" icon={<SolutionOutlined />} style={{ fontWeight: '500' }}>
-            Gestão de Pedidos
+            Gestão de Certificados
           </Menu.Item>
         </Menu>
       </Header>
