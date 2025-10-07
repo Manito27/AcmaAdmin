@@ -19,7 +19,7 @@ import dayjs from "dayjs";
 const { TextArea } = Input;
 
 const GestaoCertificados = () => {
-  const [view, setView] = useState("gestao");
+  const [view, setView] = useState("gestao"); // controla o submenu ativo
   const [certificados, setCertificados] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [associacoes, setAssociacoes] = useState([]);
@@ -29,7 +29,7 @@ const GestaoCertificados = () => {
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const baseUrl = "https://acmabackendv2.onrender.com/acma_api";
+  const baseUrl = "http://localhost:8000/api";
 
   // 🔹 Buscar certificados
   const fetchCertificados = async () => {
@@ -79,11 +79,9 @@ const GestaoCertificados = () => {
     formData.append("titulo", values.titulo);
     formData.append("descricao", values.descricao || "");
     formData.append("data_emissao", values.data_emissao.format("YYYY-MM-DD"));
-    if (values.validade) {
-      formData.append("validade", values.validade.format("YYYY-MM-DD"));
-    }
-    if (values.arquivos && values.arquivos.fileList && values.arquivos.fileList[0]) {
-      formData.append("arquivos", values.arquivos.fileList[0].originFileObj);
+    if (values.validade) formData.append("validade", values.validade.format("YYYY-MM-DD"));
+    if (values.arquivos && values.arquivos[0]) {
+      formData.append("arquivos", values.arquivos[0].originFileObj);
     }
 
     try {
@@ -96,10 +94,9 @@ const GestaoCertificados = () => {
         formCertificado.resetFields();
         fetchCertificados();
       } else {
-        const error = await res.json();
-        message.error(`Erro ao adicionar certificado: ${JSON.stringify(error)}`);
+        message.error("Erro ao adicionar certificado!");
       }
-    } catch (err) {
+    } catch {
       message.error("Falha ao conectar com o servidor!");
     }
   };
@@ -119,11 +116,9 @@ const GestaoCertificados = () => {
     formData.append("titulo", values.titulo);
     formData.append("descricao", values.descricao || "");
     formData.append("data_emissao", values.data_emissao.format("YYYY-MM-DD"));
-    if (values.validade) {
-      formData.append("validade", values.validade.format("YYYY-MM-DD"));
-    }
-    if (values.arquivos && values.arquivos.fileList && values.arquivos.fileList[0]) {
-      formData.append("arquivos", values.arquivos.fileList[0].originFileObj);
+    if (values.validade) formData.append("validade", values.validade.format("YYYY-MM-DD"));
+    if (values.arquivos && values.arquivos[0]) {
+      formData.append("arquivos", values.arquivos[0].originFileObj);
     }
 
     try {
@@ -134,13 +129,11 @@ const GestaoCertificados = () => {
       if (res.ok) {
         message.success("Certificado atualizado com sucesso!");
         setEditing(null);
-        editForm.resetFields();
         fetchCertificados();
       } else {
-        const error = await res.json();
-        message.error(`Erro ao atualizar certificado: ${JSON.stringify(error)}`);
+        message.error("Erro ao atualizar certificado!");
       }
-    } catch (err) {
+    } catch {
       message.error("Falha ao conectar com o servidor!");
     }
   };
@@ -157,7 +150,7 @@ const GestaoCertificados = () => {
       } else {
         message.error("Erro ao excluir certificado!");
       }
-    } catch (err) {
+    } catch {
       message.error("Falha ao conectar com o servidor!");
     }
   };
@@ -169,8 +162,8 @@ const GestaoCertificados = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          cliente_id: values.cliente,
-          certificado_id: values.certificado,
+          cliente: values.cliente,
+          certificado: values.certificado,
         }),
       });
       if (res.ok) {
@@ -178,10 +171,9 @@ const GestaoCertificados = () => {
         formAssociacao.resetFields();
         fetchAssociacoes();
       } else {
-        const error = await res.json();
-        message.error(`Erro ao associar certificado: ${JSON.stringify(error)}`);
+        message.error("Erro ao associar certificado!");
       }
-    } catch (err) {
+    } catch {
       message.error("Falha ao conectar com o servidor!");
     }
   };
@@ -189,26 +181,16 @@ const GestaoCertificados = () => {
   // 🔹 Colunas da tabela de certificados
   const colunasCertificados = [
     { title: "Título", dataIndex: "titulo", key: "titulo" },
-    { 
-      title: "Descrição", 
-      dataIndex: "descricao", 
-      key: "descricao",
-      render: (text) => text || "-"
-    },
+    { title: "Descrição", dataIndex: "descricao", key: "descricao" },
     { title: "Data de Emissão", dataIndex: "data_emissao", key: "data_emissao" },
-    { 
-      title: "Validade", 
-      dataIndex: "validade", 
-      key: "validade",
-      render: (text) => text || "-"
-    },
+    { title: "Validade", dataIndex: "validade", key: "validade" },
     {
       title: "Arquivo",
       dataIndex: "arquivos",
       key: "arquivos",
       render: (file) =>
         file ? (
-          <a href={file.startsWith('http') ? file : `https://acmabackendv2.onrender.com${file}`} target="_blank" rel="noreferrer">
+          <a href={`http://localhost:8000${file}`} target="_blank" rel="noreferrer">
             Ver Documento
           </a>
         ) : (
@@ -218,7 +200,7 @@ const GestaoCertificados = () => {
     {
       title: "Ações",
       key: "acoes",
-      render: (_, record) => (
+      render: (record) => (
         <div className="flex gap-2">
           <Button type="link" onClick={() => handleEdit(record)}>
             Editar
@@ -240,26 +222,8 @@ const GestaoCertificados = () => {
 
   // 🔹 Colunas da tabela de associações
   const colunasAssociacoes = [
-    { 
-      title: "Cliente", 
-      key: "cliente_nome",
-      render: (_, record) => {
-        if (record.cliente && typeof record.cliente === 'object') {
-          return `${record.cliente.nome} ${record.cliente.apelido}`;
-        }
-        return record.cliente_nome || "-";
-      }
-    },
-    { 
-      title: "Certificado", 
-      key: "certificado_titulo",
-      render: (_, record) => {
-        if (record.certificado && typeof record.certificado === 'object') {
-          return record.certificado.titulo;
-        }
-        return record.certificado_titulo || "-";
-      }
-    },
+    { title: "Cliente", dataIndex: "cliente_nome", key: "cliente_nome" },
+    { title: "Certificado", dataIndex: "certificado_titulo", key: "certificado_titulo" },
     { title: "Data de Atribuição", dataIndex: "data_atribuicao", key: "data_atribuicao" },
   ];
 
@@ -286,7 +250,7 @@ const GestaoCertificados = () => {
         {/* 🔹 Gerir Certificados */}
         {view === "gestao" && (
           <>
-            <h3 className="text-lg font-semibold mb-3">📄 Adicionar Certificados</h3>
+          <h3 className="text-lg font-semibold mb-3">📄 Adicionar Certificados</h3>
             <Form
               form={formCertificado}
               layout="vertical"
@@ -317,11 +281,7 @@ const GestaoCertificados = () => {
                 <DatePicker format="YYYY-MM-DD" className="w-full" />
               </Form.Item>
 
-              <Form.Item 
-                name="arquivos" 
-                label="Arquivo"
-                valuePropName="file"
-              >
+              <Form.Item name="arquivos" label="Arquivo">
                 <Upload beforeUpload={() => false} maxCount={1}>
                   <Button icon={<UploadOutlined />}>Selecionar Arquivo</Button>
                 </Upload>
@@ -353,7 +313,7 @@ const GestaoCertificados = () => {
             <Table
               columns={colunasAssociacoes}
               dataSource={associacoes}
-              rowKey="id"
+              rowKey={(r) => `${r.cliente}_${r.certificado}`}
               pagination={{ pageSize: 5 }}
             />
           </>
@@ -362,7 +322,6 @@ const GestaoCertificados = () => {
         {/* 🔹 Associar Certificado a Cliente */}
         {view === "associar" && (
           <Card className="mt-4 shadow-sm border rounded-lg">
-            <h3 className="text-lg font-semibold mb-3">👥 Associar Certificado a Cliente</h3>
             <Form
               form={formAssociacao}
               layout="vertical"
@@ -374,9 +333,7 @@ const GestaoCertificados = () => {
                 label="Cliente"
                 rules={[{ required: true, message: "Selecione um cliente!" }]}
               >
-                <Select placeholder="Selecione o cliente" showSearch filterOption={(input, option) =>
-                  option.children.toLowerCase().includes(input.toLowerCase())
-                }>
+                <Select placeholder="Selecione o cliente">
                   {clientes.map((c) => (
                     <Select.Option key={c.id} value={c.id}>
                       {c.nome} {c.apelido}
@@ -390,9 +347,7 @@ const GestaoCertificados = () => {
                 label="Certificado"
                 rules={[{ required: true, message: "Selecione um certificado!" }]}
               >
-                <Select placeholder="Selecione o certificado" showSearch filterOption={(input, option) =>
-                  option.children.toLowerCase().includes(input.toLowerCase())
-                }>
+                <Select placeholder="Selecione o certificado">
                   {certificados.map((cert) => (
                     <Select.Option key={cert.id} value={cert.id}>
                       {cert.titulo}
@@ -414,40 +369,25 @@ const GestaoCertificados = () => {
         <Modal
           open={!!editing}
           title="Editar Certificado"
-          onCancel={() => {
-            setEditing(null);
-            editForm.resetFields();
-          }}
+          onCancel={() => setEditing(null)}
           onOk={() => editForm.submit()}
           okText="Salvar"
           cancelText="Cancelar"
         >
           <Form form={editForm} layout="vertical" onFinish={handleUpdateCertificado}>
-            <Form.Item 
-              name="titulo" 
-              label="Título"
-              rules={[{ required: true, message: "Insira o título!" }]}
-            >
+            <Form.Item name="titulo" label="Título">
               <Input />
             </Form.Item>
             <Form.Item name="descricao" label="Descrição">
               <TextArea rows={2} />
             </Form.Item>
-            <Form.Item 
-              name="data_emissao" 
-              label="Data de Emissão"
-              rules={[{ required: true, message: "Selecione a data!" }]}
-            >
+            <Form.Item name="data_emissao" label="Data de Emissão">
               <DatePicker format="YYYY-MM-DD" className="w-full" />
             </Form.Item>
             <Form.Item name="validade" label="Validade">
               <DatePicker format="YYYY-MM-DD" className="w-full" />
             </Form.Item>
-            <Form.Item 
-              name="arquivos" 
-              label="Arquivo"
-              valuePropName="file"
-            >
+            <Form.Item name="arquivos" label="Arquivo">
               <Upload beforeUpload={() => false} maxCount={1}>
                 <Button icon={<UploadOutlined />}>Selecionar Novo Arquivo</Button>
               </Upload>
