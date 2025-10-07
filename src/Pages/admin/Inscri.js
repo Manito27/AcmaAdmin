@@ -20,7 +20,7 @@ const ListaClientes = () => {
   const [editForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [editingCliente, setEditingCliente] = useState(null);
-  const baseUrl = "http://localhost:8000/api/clientes/";
+  const baseUrl = "https://acmabackendv2.onrender.com/acma_api/clientes/";
 
   // 🔹 Buscar clientes
   const fetchClientes = async () => {
