@@ -29,7 +29,7 @@ const GestaoCertificados = () => {
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const baseUrl = "http://localhost:8000/api";
+  const baseUrl = "https://acmabackendv2.onrender.com/acma_api/";
 
   // 🔹 Buscar certificados
   const fetchCertificados = async () => {
