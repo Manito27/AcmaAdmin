@@ -1,22 +1,19 @@
-
 import React from 'react';
 import { Layout, Menu } from 'antd';
 import { TeamOutlined, FileDoneOutlined, SolutionOutlined, HomeOutlined } from '@ant-design/icons';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-
-// Importar páginas do administrador
-import Inscri from './Pages/admin/Inscri';
-import Membros from './Pages/admin/Membros';
-import Consultas from './Pages/admin/Consultas';
-
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 
 const { Header, Content, Footer } = Layout;
 
 const App = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Detecta rota atual para manter item do menu ativo
+  const selectedKey = location.pathname.split('/')[2] || 'home';
 
   const handleMenuClick = (e) => {
-    navigate(`/${e.key}`);
+    navigate(`/app/${e.key}`);
   };
 
   return (
@@ -38,20 +35,22 @@ const App = () => {
           lineHeight: '64px'
         }}
       >
-        <div style={{ 
-          fontWeight: 'bold', 
-          fontSize: '22px', 
-          color: '#fff',
-          textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
-          letterSpacing: '1px'
-        }}>
+        <div
+          style={{
+            fontWeight: 'bold',
+            fontSize: '22px',
+            color: '#fff',
+            textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
+            letterSpacing: '1px'
+          }}
+        >
           Painel do Administrador
         </div>
 
         <Menu
           theme="dark"
           mode="horizontal"
-          defaultSelectedKeys={['home']}
+          selectedKeys={[selectedKey]}
           style={{
             flex: 1,
             minWidth: 0,
@@ -63,7 +62,7 @@ const App = () => {
           }}
           onClick={handleMenuClick}
         >
-          <Menu.Item key="home" icon={<HomeOutlined />} style={{ fontWeight: '500' }}>
+          <Menu.Item key="ahome" icon={<HomeOutlined />} style={{ fontWeight: '500' }}>
             Home
           </Menu.Item>
           <Menu.Item key="inscricoes" icon={<FileDoneOutlined />} style={{ fontWeight: '500' }}>
@@ -93,12 +92,8 @@ const App = () => {
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
-          <Routes>
-            <Route path="/inscricoes" element={<Inscri />} />
-            <Route path="/membros" element={<Membros />} />
-            <Route path="/pedidos" element={<Consultas />} />
-            
-          </Routes>
+          {/* Rende as páginas filhas conforme definidas no index.js */}
+          <Outlet />
         </div>
       </Content>
 
